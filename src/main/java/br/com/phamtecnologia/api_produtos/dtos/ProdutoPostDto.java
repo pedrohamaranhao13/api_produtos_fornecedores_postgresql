@@ -11,9 +11,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class FornecedorPostDto {
+public class ProdutoPostDto {
 
+    private Integer idProduto;
     private String nome;
-    private String cnpj;
-    private String telefone;
+    private Double preco;
+    private Integer quantidade;
+    private String descricao;
+    private Integer idFornecedor;
+
 }
