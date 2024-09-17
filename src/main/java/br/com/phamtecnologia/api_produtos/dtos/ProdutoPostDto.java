@@ -13,7 +13,6 @@ import lombok.ToString;
 @ToString
 public class ProdutoPostDto {
 
-    private Integer idProduto;
     private String nome;
     private Double preco;
     private Integer quantidade;
