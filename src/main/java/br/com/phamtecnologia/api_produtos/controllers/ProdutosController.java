@@ -1,5 +1,8 @@
 package br.com.phamtecnologia.api_produtos.controllers;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.phamtecnologia.api_produtos.dtos.ProdutoGetDto;
 import br.com.phamtecnologia.api_produtos.dtos.ProdutoPostDto;
 import br.com.phamtecnologia.api_produtos.dtos.ProdutoPutDto;
 import br.com.phamtecnologia.api_produtos.entities.Fornecedor;
@@ -117,11 +121,32 @@ public class ProdutosController {
      }
 
      @GetMapping
-     public ResponseEntity<List<Produto>> getAll() {
+     public ResponseEntity<List<ProdutoGetDto>> getAll() {
         try {
          
          List<Produto> produtos = produtoRepository.findAll();
-         return ResponseEntity.status(200).body(produtos); 
+         List<ProdutoGetDto> lista = new ArrayList<ProdutoGetDto>();
+
+         for (Produto produto : produtos) {
+            ProdutoGetDto dto = new ProdutoGetDto();
+            dto.setIdProduto(produto.getIdProduto());
+            dto.setNomeProduto(produto.getNome());
+            dto.setPreco(produto.getPreco());
+            dto.setQuantidade(produto.getQuantidade());
+            dto.setTotal(BigDecimal.valueOf(produto.getPreco())
+                      .multiply(BigDecimal.valueOf(produto.getQuantidade()))
+                      .setScale(2, RoundingMode.HALF_UP)
+                      .doubleValue());
+            dto.setDescricao(produto.getDescricao());
+            dto.setIdFornecedor(produto.getFornecedor().getIdFornecedor());
+            dto.setNomeFornecedor(produto.getFornecedor().getNome());
+            dto.setCnpjFornecedor(produto.getFornecedor().getCnpj());
+            dto.setTelefoneFornecedor(produto.getFornecedor().getTelefone());
+
+            lista.add(dto);
+         }
+
+         return ResponseEntity.status(200).body(lista); 
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
@@ -129,7 +154,7 @@ public class ProdutosController {
      }
 
      @GetMapping("{idProduto}")
-     public ResponseEntity<Produto> getById(@PathVariable("idProduto") Integer idProduto) {
+     public ResponseEntity<ProdutoGetDto> getById(@PathVariable("idProduto") Integer idProduto) {
          try {
 
             Optional<Produto> optional = produtoRepository.findById(idProduto);
@@ -137,7 +162,24 @@ public class ProdutosController {
             if (optional.isPresent()) {
                
                Produto produto = optional.get();
-               return ResponseEntity.status(200).body(produto);
+
+               ProdutoGetDto dto = new ProdutoGetDto();
+               dto.setIdProduto(produto.getIdProduto());
+               dto.setNomeProduto(produto.getNome());
+               dto.setPreco(produto.getPreco());
+               dto.setQuantidade(produto.getQuantidade());
+               dto.setTotal(BigDecimal.valueOf(produto.getPreco())
+                      .multiply(BigDecimal.valueOf(produto.getQuantidade()))
+                      .setScale(2, RoundingMode.HALF_UP)
+                      .doubleValue());
+               dto.setDescricao(produto.getDescricao());
+               dto.setIdFornecedor(produto.getFornecedor().getIdFornecedor());
+               dto.setNomeFornecedor(produto.getFornecedor().getNome());
+               dto.setCnpjFornecedor(produto.getFornecedor().getCnpj());
+               dto.setTelefoneFornecedor(produto.getFornecedor().getTelefone());
+
+
+               return ResponseEntity.status(200).body(dto);
             } else {
                return ResponseEntity.status(200).body(null);
             }
